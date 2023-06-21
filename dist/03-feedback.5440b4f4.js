@@ -506,32 +506,35 @@ function hmrAcceptRun(bundle, id) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _lodashThrottle = require("lodash.throttle");
 var _lodashThrottleDefault = parcelHelpers.interopDefault(_lodashThrottle);
-const email = document.querySelector("input");
-const message = document.querySelector("textarea");
 const form = document.querySelector(".feedback-form");
+const emailElement = document.querySelector('label [name = "email"]');
+const messageElement = document.querySelector('label [name = "message"]');
+const STORAGE_KEY = "feedback-form-state";
+form.addEventListener("input", (0, _lodashThrottleDefault.default)(saveInput), 500);
+function saveInput() {
+    const email = emailElement.value;
+    const message = messageElement.value;
+    const data = {
+        email,
+        message
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+refresh();
+function refresh() {
+    const saveData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (saveData) {
+        emailElement.value = saveData.email;
+        messageElement.value = saveData.message;
+    }
+}
 form.addEventListener("submit", (event)=>{
     event.preventDefault();
-    const storedItem = localStorage.getItem("feedback-form-state");
-    if (storedItem !== undefined && storedItem !== null) console.log(storedItem);
-    email.value = null;
-    message.value = null;
-    localStorage.removeItem("feedback-form-state");
+    const email = emailElement.value;
+    const message = messageElement.value;
+    form.reset();
+    localStorage.removeItem(STORAGE_KEY);
 });
-const throttleFunction = (0, _lodashThrottleDefault.default)(updateLocalStorage, 500);
-form.addEventListener("input", throttleFunction);
-const storageObject = localStorage.getItem("feedback-form-state");
-if (storageObject !== undefined && storageObject !== null) {
-    const { email: emailValue , message: messageValue  } = JSON.parse(storageObject);
-    if (emailValue !== undefined && emailValue !== "") email.value = emailValue;
-    if (messageValue !== undefined && messageValue !== "") message.value = messageValue;
-}
-function updateLocalStorage() {
-    const storedObject = {
-        email: email.value,
-        message: message.value
-    };
-    localStorage.setItem("feedback-form-state", JSON.stringify(storedObject));
-}
 
 },{"lodash.throttle":"bGJVT","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bGJVT":[function(require,module,exports) {
 var global = arguments[3];
